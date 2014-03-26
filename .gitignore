@@ -1,0 +1,22 @@
+obj/
+x64*/
+[Ii]pch/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+[Aa]nalyze*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+*Inspector XE Results*/
+aspnet_client
+Thumbs.db
+*.ipch
+*.aps
+*.vspscc
+*.ncb
+*.suo
+*.opensdf
+*.ilk
+*.sdf
+*.vsp
+*.user
