@@ -26,16 +26,57 @@
 //######################################################################################################################
 
 #include "stdafx.h"
+#include "SpheroRAWItf.h"
+
 #include <string>
 #include <iostream>
-#include "SpheroRAWItf.h"
+
+using namespace std;
+
+//======================================================================================================================
+
+void PrintDeviceStatus(string action, ISpheroDevice* device) {
+    cout << "Action: " << action << endl;
+
+    if(device == nullptr) {
+        cout << " |-- Error: Sphero handle is invalid" << endl;
+        return;
+    }
+
+    switch(device->state()) {
+        case SpheroState_None:                  { cout << " |-- Sphero not initialized"                     << endl; break; }
+        case SpheroState_Error_AdapterMissing:  { cout << " |-- Error: No valid Bluetooth adapter found"    << endl; break; }
+        case SpheroState_Error_NotPaired:       { cout << " |-- Error: Specified Sphero not Paired"         << endl; break; }
+        case SpheroState_Disconnected:          { cout << " |-- Sphero disconnected"                        << endl; break; }
+        case SpheroState_Connected:             { cout << " |-- Sphero connected"                           << endl;break; }
+    }
+
+    cout << endl;
+}
+
+//======================================================================================================================
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+    //------------------------------------------------------------------------------------------------------------------
+    // Create device 
     ISpheroDevice* device = SpheroRAW_Create("Sphero-GRB");
+    PrintDeviceStatus("SpheroRAW_Create(\"Sphero-GRB\");", device);
 
-    SpheroRAW_Destroy(device);
-    std::cin.get();
+    //------------------------------------------------------------------------------------------------------------------
+    // connect 
+    device->connect();
+    PrintDeviceStatus("device->connect();", device);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Destroy device 
+    SpheroRAW_Destroy(device); device = nullptr;
+    PrintDeviceStatus("SpheroRAW_Destroy(device); device = nullptr;", device);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Keep terminal open 
+    cin.get();
 	return 0;
 }
 
+//======================================================================================================================

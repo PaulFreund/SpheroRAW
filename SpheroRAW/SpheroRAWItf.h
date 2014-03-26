@@ -59,12 +59,13 @@ struct SpheroDataOutput {
 enum SpheroState {
     SpheroState_None = 0,
     SpheroState_Error_AdapterMissing = 1,
-    SpheroState_Error_Unknown_Name = 2,
+    SpheroState_Error_NotPaired = 2,
     SpheroState_Disconnected = 3,
     SpheroState_Connected = 4
 };
 
 class ISpheroDevice {
+public:
     virtual SpheroState state() = 0;
 
     virtual SpheroState connect() = 0;

@@ -66,6 +66,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BluetoothWrapper.h" />
     <ClInclude Include="SpheroDevice.h" />
     <ClInclude Include="SpheroRAWItf.h" />
   </ItemGroup>

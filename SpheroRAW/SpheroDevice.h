@@ -27,52 +27,32 @@
 
 #include <string>
 #include "SpheroRAWItf.h"
-
-//======================================================================================================================
-
-#include <winsock2.h>
-#include <ws2bth.h>
-#include "BluetoothAPIs.h"
-#pragma comment(lib, "Bthprops.lib")
-
-#include <iostream>
+#include "BluetoothWrapper.h"
 
 //======================================================================================================================
 
 class SpheroDevice : ISpheroDevice {
+private:
+    SpheroState _state;
+
 public:
-    SpheroDevice(std::string name) {
-        HBLUETOOTH_DEVICE_FIND founded_device;
-
-        BLUETOOTH_DEVICE_INFO device_info;
-        device_info.dwSize = sizeof(device_info);
-
-        BLUETOOTH_DEVICE_SEARCH_PARAMS search_criteria;
-        search_criteria.dwSize = sizeof(BLUETOOTH_DEVICE_SEARCH_PARAMS);
-        search_criteria.fReturnAuthenticated = TRUE;
-        search_criteria.fReturnRemembered = FALSE;
-        search_criteria.fReturnConnected = TRUE;
-        search_criteria.fReturnUnknown = FALSE;
-        search_criteria.fIssueInquiry = FALSE;
-        search_criteria.cTimeoutMultiplier = 0;
-        founded_device = BluetoothFindFirstDevice(&search_criteria, &device_info);
-
-
-
-        if(founded_device == NULL) {
+    SpheroDevice(std::string name) : _state(SpheroState_None) {
+        if(!BluetoothAdapterAvailable()) {
+            _state = SpheroState_Error_AdapterMissing;
+            return;
         }
 
-        do {
-            std::cout << "founded device: " << device_info.szName << std::endl;
-
+        if(!BluetoothDevicePaired(name)) {
+            _state = SpheroState_Error_NotPaired;
+            return;
         }
-        while(BluetoothFindNextDevice(founded_device, &device_info));
     }
 
     ~SpheroDevice() {
 
     }
 
+public:
     virtual SpheroState state() {
         return SpheroState_None;
     }
