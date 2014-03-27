@@ -10,7 +10,7 @@ Currently Visual Studio 2013 on Windows is required to build and the binary will
 
 ## Implemented
 
-Unfortunately none yet
+* Connect to a Sphero and communicate with it on Windows
 
 ## Planned
 

@@ -81,8 +81,18 @@ public:
         else
             _state = SpheroState_Connected;
 
-        std::vector<ubyte> sendData = GenerateClientCommand(SpheroDeviceId_Core, SpheroCommandId_Ping, 0x42);
-        BluetoothSend(_socket, sendData);
+#ifdef _DEBUG
+        std::vector<ubyte> pingData = GenerateCommand(DeviceId_CORE, CoreCommandId_PING);
+        BluetoothSend(_socket, pingData);
+
+        std::vector<ubyte> colorData;
+        colorData.push_back(0xFF);
+        colorData.push_back(0x00);
+        colorData.push_back(0xFF);
+        colorData.push_back(0x00);
+        std::vector<ubyte> setRGBLedData = GenerateCommand(DeviceId_SPHERO, SpheroCommandId_SET_RGB_LED, 0x00, colorData);
+        BluetoothSend(_socket, setRGBLedData);
+#endif
 
         return _state;
     }
