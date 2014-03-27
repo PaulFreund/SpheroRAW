@@ -27,45 +27,78 @@
 
 #include <string>
 #include "SpheroRAWItf.h"
-#include "BluetoothWrapper.h"
+
+#include "SpheroProtocol.h"
+using namespace Sphero::Protocol;
+#ifdef _WIN32
+    #include "BluetoothWrapper_Win32.h"
+#else
+    #error
+#endif
 
 //======================================================================================================================
 
-class SpheroDevice : ISpheroDevice {
+class SpheroDevice : public ISpheroDevice {
 private:
+    std::string _name;
     SpheroState _state;
+    BluetoothSocket _socket = BLUETOOTH_SOCKET_INVALID;
 
 public:
-    SpheroDevice(std::string name) : _state(SpheroState_None) {
-        if(!BluetoothAdapterAvailable()) {
-            _state = SpheroState_Error_AdapterMissing;
+    SpheroDevice(std::string name) : _name(name) {
+        if(!BluetoothInitialize()) {
+            _state = SpheroState_Error_BluetoothError;
             return;
         }
 
-        if(!BluetoothDevicePaired(name)) {
+        if(!BluetoothAvailable()) {
+            _state = SpheroState_Error_BluetoothUnavailable;
+            return;
+        }
+
+        if(!BluetoothDevicePaired(_name)) {
             _state = SpheroState_Error_NotPaired;
             return;
         }
+
+        _state = SpheroState_Disconnected;
     }
 
     ~SpheroDevice() {
-
+        BluetoothCleanup();
     }
 
 public:
     virtual SpheroState state() {
-        return SpheroState_None;
+        return _state;
     }
 
     virtual SpheroState connect() {
-        return SpheroState_None;
+        _socket = BluetoothConnect(_name);
+
+        if(_socket == BLUETOOTH_SOCKET_INVALID)
+            _state = SpheroState_Error_ConnectionFailed;
+        else
+            _state = SpheroState_Connected;
+
+        std::vector<ubyte> sendData = GenerateClientCommand(SpheroDeviceId_Core, SpheroCommandId_Ping, 0x42);
+        BluetoothSend(_socket, sendData);
+
+        return _state;
     }
 
     virtual SpheroState disconnect() {
-        return SpheroState_None;
+        BluetoothDisconnect(_socket);
+        _socket = BLUETOOTH_SOCKET_INVALID;
+        _state = SpheroState_Disconnected;
+        return _state;
     }
 
     virtual SpheroDataInput pull() {
+        std::vector<ubyte> data;
+        if(!BluetoothReceive(_socket, data))
+            _state = SpheroState_Disconnected;
+
         return SpheroDataInput();
     }
 

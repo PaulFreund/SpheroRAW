@@ -35,8 +35,7 @@
 //======================================================================================================================
 
 SPHERO_RAW_API ISpheroDevice* SpheroRAW_Create(const char* nameBuffer) {
-    SpheroDevice* newDevice = new SpheroDevice(std::string(nameBuffer));
-    return (ISpheroDevice*)newDevice;
+    return new SpheroDevice(std::string(nameBuffer));
 }
 
 //======================================================================================================================

@@ -26,6 +26,7 @@
 //######################################################################################################################
 
 #include "stdafx.h"
+#include <windows.h>
 #include "SpheroRAWItf.h"
 
 #include <string>
@@ -44,11 +45,13 @@ void PrintDeviceStatus(string action, ISpheroDevice* device) {
     }
 
     switch(device->state()) {
-        case SpheroState_None:                  { cout << " |-- Sphero not initialized"                     << endl; break; }
-        case SpheroState_Error_AdapterMissing:  { cout << " |-- Error: No valid Bluetooth adapter found"    << endl; break; }
-        case SpheroState_Error_NotPaired:       { cout << " |-- Error: Specified Sphero not Paired"         << endl; break; }
-        case SpheroState_Disconnected:          { cout << " |-- Sphero disconnected"                        << endl; break; }
-        case SpheroState_Connected:             { cout << " |-- Sphero connected"                           << endl;break; }
+        case SpheroState_None:                          { cout << " |-- SpheroRAW not initialized"                  << endl; break; }
+        case SpheroState_Error_BluetoothError:          { cout << " |-- Error: Couldn't initialize Bluetooth stack" << endl; break; }
+        case SpheroState_Error_BluetoothUnavailable:    { cout << " |-- Error: No valid Bluetooth adapter found"    << endl; break; }
+        case SpheroState_Error_NotPaired:               { cout << " |-- Error: Specified Sphero not Paired"         << endl; break; }
+        case SpheroState_Error_ConnectionFailed:        { cout << " |-- Error: Connecting failed"                   << endl; break; }
+        case SpheroState_Disconnected:                  { cout << " |-- Sphero disconnected"                        << endl; break; }
+        case SpheroState_Connected:                     { cout << " |-- Sphero connected"                           << endl; break; }
     }
 
     cout << endl;
@@ -64,9 +67,22 @@ int _tmain(int argc, _TCHAR* argv[])
     PrintDeviceStatus("SpheroRAW_Create(\"Sphero-GRB\");", device);
 
     //------------------------------------------------------------------------------------------------------------------
-    // connect 
+    // Connect 
     device->connect();
     PrintDeviceStatus("device->connect();", device);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Send/Receive Data
+    for(; device->state() == SpheroState_Connected;) {
+        device->pull();
+        PrintDeviceStatus("device->pull();", device);
+        Sleep(1000);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Disconnect 
+    device->disconnect();
+    PrintDeviceStatus("device->disconnect();", device);
 
     //------------------------------------------------------------------------------------------------------------------
     // Destroy device 

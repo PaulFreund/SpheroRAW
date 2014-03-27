@@ -58,10 +58,12 @@ struct SpheroDataOutput {
 
 enum SpheroState {
     SpheroState_None = 0,
-    SpheroState_Error_AdapterMissing = 1,
-    SpheroState_Error_NotPaired = 2,
-    SpheroState_Disconnected = 3,
-    SpheroState_Connected = 4
+    SpheroState_Error_BluetoothError = 1,
+    SpheroState_Error_BluetoothUnavailable = 2,
+    SpheroState_Error_NotPaired = 3,
+    SpheroState_Error_ConnectionFailed = 4,
+    SpheroState_Disconnected = 5,
+    SpheroState_Connected = 6
 };
 
 class ISpheroDevice {
