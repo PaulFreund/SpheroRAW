@@ -122,11 +122,6 @@ BluetoothSocket BluetoothConnect(std::string name) {
         return BLUETOOTH_SOCKET_INVALID; 
     }
 
-    u_long blockingMode = 1; // Non-zero means non-blocking
-    if(ioctlsocket(btSock, FIONBIO, &blockingMode) == SOCKET_ERROR) {
-        return BLUETOOTH_SOCKET_INVALID;
-    }
-
     return btSock;
 }
 
@@ -151,7 +146,12 @@ bool BluetoothSend(BluetoothSocket &socket, const std::vector<ubyte> data) {
     return true;
 }
 
-bool BluetoothReceive(BluetoothSocket &socket, std::vector<ubyte>& data) {
+bool BluetoothReceive(BluetoothSocket &socket, std::vector<ubyte>& data, bool bBlocking = false) {
+
+    u_long blockingMode = bBlocking ? 1 : 0; // Non-zero means non-blocking
+    if(ioctlsocket(socket, FIONBIO, &blockingMode) == SOCKET_ERROR) {
+        return false;
+    }
 
     data.reserve(2048);
     data.resize(2048);

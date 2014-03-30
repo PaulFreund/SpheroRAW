@@ -29,7 +29,6 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
-typedef unsigned char ubyte;
 
 //======================================================================================================================
 
@@ -142,7 +141,8 @@ namespace Sphero {
 			ResponseCode_FLASH_FAIL	    = 0x33,
 			ResponseCode_MA_CORRUPT	    = 0x34,
 			ResponseCode_MSG_TIMEOUT	= 0x35
-        };
+        };
+
         enum AsyncResponseIdCodes {
             AsyncResponseId_PowerNotification           = 0x01,
             AsyncResponseId_Level1DiagnosticResponse    = 0x02,

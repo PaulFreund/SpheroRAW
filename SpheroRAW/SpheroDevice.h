@@ -44,6 +44,8 @@ private:
     SpheroState _state;
     BluetoothSocket _socket = BLUETOOTH_SOCKET_INVALID;
 
+    std::vector<SpheroNotification> _notifications;
+
 public:
     SpheroDevice(std::string name) : _name(name) {
         if(!BluetoothInitialize()) {
@@ -104,16 +106,13 @@ public:
         return _state;
     }
 
-    virtual SpheroDataInput pull() {
-        std::vector<ubyte> data;
-        if(!BluetoothReceive(_socket, data))
-            _state = SpheroState_Disconnected;
+    virtual std::vector<SpheroNotification> receive() {
+        std::vector<SpheroNotification> data;
 
-        return SpheroDataInput();
-    }
+        //if(!BluetoothReceive(_socket, data))
+        //    _state = SpheroState_Disconnected;
 
-    virtual void push(SpheroDataOutput data) {
-        return;
+        return data;
     }
 };
 

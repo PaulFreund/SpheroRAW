@@ -74,8 +74,8 @@ int _tmain(int argc, _TCHAR* argv[])
     //------------------------------------------------------------------------------------------------------------------
     // Send/Receive Data
     for(; device->state() == SpheroState_Connected;) {
-        device->pull();
-        PrintDeviceStatus("device->pull();", device);
+        device->receive();
+        PrintDeviceStatus("device->receive();", device);
         Sleep(1000);
     }
 
