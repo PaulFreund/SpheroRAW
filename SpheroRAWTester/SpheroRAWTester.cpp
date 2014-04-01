@@ -57,6 +57,12 @@ void PrintDeviceStatus(string action, ISpheroDevice* device) {
     cout << endl;
 }
 
+void OrbBasicAppendLine(ISpheroDevice* device, std::string lineText) {
+    std::vector<ubyte> program(lineText.begin(), lineText.end());
+    program.insert(program.end(), '\n');
+    device->appendOrbBasicFragment(0, program);
+}
+
 //======================================================================================================================
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -71,12 +77,23 @@ int _tmain(int argc, _TCHAR* argv[])
         // Connect 
         device->connect();
         PrintDeviceStatus("Connecting", device);
+        device->abortOrbBasicProgram();
 
         //------------------------------------------------------------------------------------------------------------------
         // Send/Receive Data
         for(; device->state() == SpheroState_Connected;) {
             std::vector<SpheroMessage> messages = device->receive();
-
+            for(auto message : messages) {
+                if(message.idCode == AsyncResponseId_orbBasicErrorMessageASCII) {
+                    std::string error(message.data.begin(), message.data.end());
+                    std::cout << "[OrbBasic] [Error] " << error << std::endl;
+                }
+                if(message.idCode == AsyncResponseId_orbBasicPrintMessage) {
+                    std::string print(message.data.begin(), message.data.end());
+                    std::cout << "[OrbBasic] [Print] " << print << std::endl;
+                }
+            }
+            
             if(GetAsyncKeyState('P'))
                 device->ping();
 
@@ -92,6 +109,29 @@ int _tmain(int argc, _TCHAR* argv[])
             if(GetAsyncKeyState('T'))
                 device->getVoltageTripPoints();
 
+            if(GetAsyncKeyState('O')) {
+                device->eraseOrbBasicStorage(0);
+
+                //// Full scale
+                //OrbBasicAppendLine(device, "10 R = ((gyroX+20000)/157.01)");
+                //OrbBasicAppendLine(device, "20 G = ((gyroY+20000)/157)");
+                //OrbBasicAppendLine(device, "30 B = ((gyroZ+20000)/157)");
+
+                OrbBasicAppendLine(device, "10 print \"RPJ:\",roll,pitch,yaw");
+                OrbBasicAppendLine(device, "20 R = ((roll+180)*1000) / 1412");
+                OrbBasicAppendLine(device, "30 G = ((pitch+90)*1000) /  705");
+                OrbBasicAppendLine(device, "40 B = (yaw*1000)        / 1408");
+                OrbBasicAppendLine(device, "75 print \"RGB:\",R,G,B");
+                OrbBasicAppendLine(device, "80 RGB R,G,B");
+                OrbBasicAppendLine(device, "90 delay 1");
+                OrbBasicAppendLine(device, "95 goto 10");
+                device->appendOrbBasicFragment(0, { '\0' });
+                device->executeOrbBasicProgram(0, 10);
+            }
+
+            if(GetAsyncKeyState('A'))
+                device->abortOrbBasicProgram();
+
             if(GetAsyncKeyState('Q')) {
                 quit = true;
                 break;
@@ -99,7 +139,12 @@ int _tmain(int argc, _TCHAR* argv[])
             Sleep(50);
         }
         PrintDeviceStatus("Poll loop exited", device);
-        Sleep(1000);
+
+        if(GetAsyncKeyState('Q')) {
+            quit = true;
+            break;
+        }
+        Sleep(100);
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -47,7 +47,7 @@ Response packets and asynchroneus packets have to be periodically polled from th
 
 	std::vector<SpheroMessage> newMessages = device->receive();
 	
-A SpheroMessage can either contain a response packet which is indicated by a nonzero sequenceId or a asynchroneus packet which is indicated by a nonzero idCode.
+A SpheroMessage can either contain a response packet which is indicated by a nonzero sequenceId or a asynchroneus packet which is indicated by a nonzero idCode. To see debug messages from the raw commands define SPHERORAW_DEBUG_DEBUG in the library
 
 ## SpheroRAW API
 

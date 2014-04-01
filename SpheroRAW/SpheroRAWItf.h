@@ -296,7 +296,7 @@ public:
     virtual SequenceId appendMacroChunk(const CommandParameters macroData) = 0;
     virtual SequenceId eraseOrbBasicStorage(const ubyte area) = 0;
     virtual SequenceId appendOrbBasicFragment(const ubyte area, const CommandParameters fragment) = 0;
-    virtual SequenceId executeOrbBasicFragment(const ubyte area) = 0;
+    virtual SequenceId executeOrbBasicProgram(const ubyte area, const ushort startLine) = 0;
     virtual SequenceId abortOrbBasicProgram() = 0;
     virtual SequenceId submitValueToInputStatement(const uint value) = 0;
     virtual SequenceId commitRAMProgramToFlash() = 0;

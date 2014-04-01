@@ -31,7 +31,12 @@
 #include <algorithm>
 #include <numeric>
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//    #define SPHERORAW_DEBUG_DEBUG
+//#endif
+
+
+#ifdef SPHERORAW_DEBUG_DEBUG
     #include <sstream>
     #include <iostream>
     #include <iomanip>
@@ -504,8 +509,13 @@ public:
         return deviceSend(DeviceId_SPHERO, SpheroCommandId_APPEND_ORBBASIC_FRAGMENT, data);
     }
 
-    virtual SequenceId executeOrbBasicFragment(const ubyte area) {
-        return deviceSend(DeviceId_SPHERO, SpheroCommandId_EXECUTE_ORBBASIC_PROGRAM, { area });
+    virtual SequenceId executeOrbBasicProgram(const ubyte area, const ushort startLine) {
+        std::vector<ubyte> data;
+        ushort net_startLine = htons(startLine);
+        data.push_back(area);
+        data.push_back((net_startLine >> (8 * 0)) & 0xff);
+        data.push_back((net_startLine >> (8 * 1)) & 0xff);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_EXECUTE_ORBBASIC_PROGRAM, data);
     }
 
     virtual SequenceId abortOrbBasicProgram() {
@@ -535,7 +545,7 @@ private:
         SequenceId seqId = nextSeqId();
         std::vector<ubyte> commandData = generateCommand(device, command, seqId, data);
 
-        #ifdef _DEBUG
+        #ifdef SPHERORAW_DEBUG
                 std::stringstream mss;
                 mss << "[SEND][" << std::setw(3) << commandData.size() << "B] ";
                 for(size_t idx = 0; idx < commandData.size(); ++idx) {
@@ -600,7 +610,7 @@ private:
             if(_receiveBuffer[dataLength+4] != checkSum)
                 return SpheroState_Disconnected;
 
-            #ifdef _DEBUG
+            #ifdef SPHERORAW_DEBUG
                         std::stringstream mss;
                         mss << "[RECV][" << std::setw(3) << messageLength << "B] ";
                         for(size_t idx = 0; idx < messageLength; ++idx) {
