@@ -22,24 +22,29 @@ Currently Visual Studio 2013 on Windows is required to build and the binary will
 # Documentation
 
 Creating and destroying device handle:
+
 	ISpheroDevice* device = SpheroRAW_Create("Sphero-GRB");
 	...
 	SpheroRAW_Destroy(device);
 
 Connect and disconnect from device:
+
 	device->connect();
 	...
 	device->disconnect();
 	
 The API does not throw exceptions. After every command the connection status should be checked:
+
 	if(device->state() == SpheroState_Connected) {
 		...
 	}
 	
 Every active command returns a SequenceId which cycles from 1 to 255 and is reflected in the belonging response:
+
 	SequenceId pingId = device->ping();
 
 Response packets and asynchroneus packets have to be periodically polled from the device:
+
 	std::vector<SpheroMessage> newMessages = device->receive();
 	
 A SpheroMessage can either contain a response packet which is indicated by a nonzero sequenceId or a asynchroneus packet which is indicated by a nonzero idCode.
