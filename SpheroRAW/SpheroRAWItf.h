@@ -300,7 +300,6 @@ public:
     virtual SequenceId abortOrbBasicProgram() = 0;
     virtual SequenceId submitValueToInputStatement(const uint value) = 0;
     virtual SequenceId commitRAMProgramToFlash() = 0;
-
 };
 
 //======================================================================================================================
