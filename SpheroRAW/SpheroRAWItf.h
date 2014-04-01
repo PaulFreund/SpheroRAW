@@ -47,6 +47,7 @@ typedef uint32_t uint;
 typedef ubyte SequenceId;
 #define INVALID_SEQUENCE_ID 0
 typedef std::vector<ubyte> MessageData;
+typedef std::vector<ubyte> CommandParameters;
 
 //======================================================================================================================
 
@@ -232,7 +233,7 @@ public:
     virtual SequenceId performLevel1Diagnostics() = 0;
     virtual SequenceId performLevel2Diagnostics() = 0;
     virtual SequenceId clearCouters() = 0;
-    virtual SequenceId assignTimeValue() = 0;
+    virtual SequenceId assignTimeValue(const uint timeValue = 0) = 0;
     virtual SequenceId pollPacketTimes(const uint spheroRxTime, const uint spheroTxTime) = 0;
 
     // Sphero commands
@@ -240,30 +241,30 @@ public:
     virtual SequenceId setStabilisation(const bool enable) = 0;
     virtual SequenceId setRotationRate(const ubyte rate) = 0;
     virtual SequenceId getChassisId() = 0;
-    virtual SequenceId selfLevel(const MessageData data) = 0;
-    virtual SequenceId setDataStreaming(const MessageData data) = 0;
-    virtual SequenceId configureCollisionDetection(const MessageData data) = 0;
-    virtual SequenceId configureLocator(const MessageData data) = 0;
+    virtual SequenceId selfLevel(const CommandParameters data) = 0;
+    virtual SequenceId setDataStreaming(const CommandParameters data) = 0;
+    virtual SequenceId configureCollisionDetection(const CommandParameters data) = 0;
+    virtual SequenceId configureLocator(const CommandParameters data) = 0;
     virtual SequenceId setAccelerometerRange(const ubyte range) = 0;
     virtual SequenceId readLocator() = 0;
     virtual SequenceId setRGBLedOutput(const ubyte red, const ubyte green, const ubyte blue, const bool persist) = 0;
     virtual SequenceId setBackLEDOutput(const ubyte intensity) = 0;
     virtual SequenceId getRGBLed() = 0;
     virtual SequenceId roll(const ubyte speed, const ushort heading, const ubyte state) = 0;
-    virtual SequenceId boost(const bool enable) = 0;
+    virtual SequenceId boost(const bool enable = true) = 0;
     virtual SequenceId setRAWMotorValues(const ubyte modeLeft, const ubyte powerLeft, const ubyte modeRight, const ubyte powerRight) = 0;
     virtual SequenceId setMotionTimeout(const ushort msecTimeout) = 0;
-    virtual SequenceId setPermanentOptionFlags(const MessageData data) = 0;
+    virtual SequenceId setPermanentOptionFlags(const CommandParameters data) = 0;
     virtual SequenceId getPermanentOptionFlags() = 0;
-    virtual SequenceId setTemporaryOptionFlags(const MessageData data) = 0;
+    virtual SequenceId setTemporaryOptionFlags(const CommandParameters data) = 0;
     virtual SequenceId getTemporaryOptionFlags() = 0;
     virtual SequenceId getConfigurationBlock(const ubyte id) = 0;
-    virtual SequenceId setSSBModifierBlock(const uint pwd, const MessageData data) = 0;
+    virtual SequenceId setSSBModifierBlock(const uint pwd, const CommandParameters data) = 0;
     virtual SequenceId setDeviceMode(const bool enableHackMode) = 0;
-    virtual SequenceId setConfigurationBlock(const MessageData data) = 0;
+    virtual SequenceId setConfigurationBlock(const CommandParameters data) = 0;
     virtual SequenceId getDeviceMode() = 0;
     virtual SequenceId getSSB() = 0;
-    virtual SequenceId setSSB(const uint password, const MessageData data) = 0;
+    virtual SequenceId setSSB(const uint password, const CommandParameters data) = 0;
     virtual SequenceId refillBank(const ubyte type) = 0;
     virtual SequenceId buyConsumable(const ubyte id, const ubyte quantity) = 0;
     virtual SequenceId useConsumable(const ubyte id) = 0;
@@ -273,15 +274,15 @@ public:
     virtual SequenceId getPasswordSeed() = 0;
     virtual SequenceId boolenableSSBAsyncMessages(const bool enable) = 0;
     virtual SequenceId runMacro(const ubyte id) = 0;
-    virtual SequenceId saveTemporaryMacro(const MessageData macroData) = 0;
-    virtual SequenceId saveMacro(const MessageData macroData) = 0;
+    virtual SequenceId saveTemporaryMacro(const CommandParameters macroData) = 0;
+    virtual SequenceId saveMacro(const CommandParameters macroData) = 0;
     virtual SequenceId reinitMacroExecutive() = 0;
     virtual SequenceId abortMacro() = 0;
     virtual SequenceId getMacroStatus() = 0;
     virtual SequenceId setMacroParameter(const ubyte parameter, const ubyte valueOne, const ubyte value) = 0;
-    virtual SequenceId appendMacroChunk(const MessageData macroData) = 0;
+    virtual SequenceId appendMacroChunk(const CommandParameters macroData) = 0;
     virtual SequenceId eraseOrbBasicStorage(const ubyte area) = 0;
-    virtual SequenceId appendOrbBasicFragment(const ubyte area, const MessageData fragment) = 0;
+    virtual SequenceId appendOrbBasicFragment(const ubyte area, const CommandParameters fragment) = 0;
     virtual SequenceId executeOrbBasicFragment(const ubyte area) = 0;
     virtual SequenceId abortOrbBasicProgram() = 0;
     virtual SequenceId submitValueToInputStatement(const uint value) = 0;

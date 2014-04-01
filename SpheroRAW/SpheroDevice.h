@@ -203,135 +203,178 @@ public:
 	}
 
     virtual SequenceId jumpToBootloader() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_CORE, CoreCommandId_GOTO_BL);
 	}
 
     virtual SequenceId performLevel1Diagnostics() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_CORE, CoreCommandId_RUN_L1_DIAGS);
 	}
 
     virtual SequenceId performLevel2Diagnostics() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_CORE, CoreCommandId_RUN_L2_DIAGS);
 	}
 
     virtual SequenceId clearCouters() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_CORE, CoreCommandId_CLEAR_COUNTERS);
 	}
 
-    virtual SequenceId assignTimeValue() {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId assignTimeValue(const uint timeValue = 0) {
+        std::vector<ubyte> data;
+        uint net_timeValue = htons(timeValue);
+        data.push_back((net_timeValue >> (8 * 0)) & 0xff);
+        data.push_back((net_timeValue >> (8 * 1)) & 0xff);
+        data.push_back((net_timeValue >> (8 * 2)) & 0xff);
+        data.push_back((net_timeValue >> (8 * 3)) & 0xff);
+        return deviceSend(DeviceId_CORE, CoreCommandId_ASSIGN_TIME, data);
 	}
 
     virtual SequenceId pollPacketTimes(const uint spheroRxTime, const uint spheroTxTime) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        uint net_spheroRxTime = htons(spheroRxTime);
+        uint net_spheroTxTime = htons(spheroTxTime);
+        data.push_back((net_spheroRxTime >> (8 * 0)) & 0xff);
+        data.push_back((net_spheroRxTime >> (8 * 1)) & 0xff);
+        data.push_back((net_spheroRxTime >> (8 * 2)) & 0xff);
+        data.push_back((net_spheroRxTime >> (8 * 3)) & 0xff);
+        data.push_back((net_spheroTxTime >> (8 * 0)) & 0xff);
+        data.push_back((net_spheroTxTime >> (8 * 1)) & 0xff);
+        data.push_back((net_spheroTxTime >> (8 * 2)) & 0xff);
+        data.push_back((net_spheroTxTime >> (8 * 3)) & 0xff);
+        return deviceSend(DeviceId_CORE, CoreCommandId_POLL_TIMES, data);
 	}
 
     // Sphero commands
     virtual SequenceId setHeading(const ushort heading) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        ushort net_heading = htons(heading);
+        data.push_back((net_heading >> (8 * 0)) & 0xff);
+        data.push_back((net_heading >> (8 * 1)) & 0xff);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_CAL, data);
 	}
 
-    virtual SequenceId setStabilisation(const bool enable) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId setStabilisation(const bool enable = true) {
+        ubyte flag_enable = enable ? 0x01 : 0x00;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_STABILIZ, { flag_enable });
 	}
 
     virtual SequenceId setRotationRate(const ubyte rate) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_ROTATION_RATE, { rate });
 	}
 
     virtual SequenceId getChassisId() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_CHASSIS_ID);
 	}
 
-    virtual SequenceId selfLevel(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId selfLevel(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SELF_LEVEL, data);
 	}
 
-    virtual SequenceId setDataStreaming(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId setDataStreaming(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_DATA_STREAMING, data);
 	}
 
-    virtual SequenceId configureCollisionDetection(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId configureCollisionDetection(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_COLLISION_DET, data);
 	}
 
-    virtual SequenceId configureLocator(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId configureLocator(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_LOCATOR, data);
 	}
 
     virtual SequenceId setAccelerometerRange(const ubyte range) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_ACCELERO, { range });
 	}
 
     virtual SequenceId readLocator() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_READ_LOCATOR);
 	}
 
     virtual SequenceId setRGBLedOutput(const ubyte red, const ubyte green, const ubyte blue, const bool persist) {
-        std::vector<ubyte> colorData;
-        colorData.push_back(red);
-        colorData.push_back(green);
-        colorData.push_back(blue);
-
-        ubyte persistFlag = persist ? 0x01 : 0x00;
-        colorData.push_back(persistFlag);
-
-        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_RGB_LED, colorData);
+        ubyte flag_persist = persist ? 0x01 : 0x00;
+        std::vector<ubyte> data;
+        data.push_back(red);
+        data.push_back(green);
+        data.push_back(blue);
+        data.push_back(flag_persist);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_RGB_LED, data);
     }
 
     virtual SequenceId setBackLEDOutput(const ubyte intensity) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_BACK_LED, { intensity });
 	}
 
     virtual SequenceId getRGBLed() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_RGB_LED);
 	}
 
     virtual SequenceId roll(const ubyte speed, const ushort heading, const ubyte state) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        ushort net_heading = htons(heading);
+        data.push_back(speed);
+        data.push_back((net_heading >> (8 * 0)) & 0xff);
+        data.push_back((net_heading >> (8 * 1)) & 0xff);
+        data.push_back(state);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_ROLL, data);
 	}
 
-    virtual SequenceId boost(const bool enable) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId boost(const bool enable = true) {
+        ubyte flag_enable = enable ? 0x01 : 0x00;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_BOOST, { flag_enable });
 	}
 
     virtual SequenceId setRAWMotorValues(const ubyte modeLeft, const ubyte powerLeft, const ubyte modeRight, const ubyte powerRight) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        data.push_back(modeLeft);
+        data.push_back(powerLeft);
+        data.push_back(modeRight);
+        data.push_back(powerRight);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_RAW_MOTORS, data);
 	}
 
     virtual SequenceId setMotionTimeout(const ushort msecTimeout) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        ushort net_msecTimeout = htons(msecTimeout);
+        data.push_back((net_msecTimeout >> (8 * 0)) & 0xff);
+        data.push_back((net_msecTimeout >> (8 * 1)) & 0xff);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_MOTION_TO, data);
 	}
 
-    virtual SequenceId setPermanentOptionFlags(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId setPermanentOptionFlags(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_OPTIONS_FLAG, data);
 	}
 
     virtual SequenceId getPermanentOptionFlags() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_OPTIONS_FLAG);
 	}
 
-    virtual SequenceId setTemporaryOptionFlags(const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId setTemporaryOptionFlags(const CommandParameters data) {
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_TEMP_OPTIONS_FLAG, data);
 	}
 
     virtual SequenceId getTemporaryOptionFlags() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_TEMP_OPTIONS_FLAG);
 	}
 
     virtual SequenceId getConfigurationBlock(const ubyte id) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_CONFIG_BLK, { id });
 	}
 
-    virtual SequenceId setSSBModifierBlock(const uint pwd, const MessageData data) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId setSSBModifierBlock(const uint pwd, const CommandParameters data) {
+        std::vector<ubyte> commandData;
+        uint net_pwd = htons(pwd);
+        commandData.push_back((net_pwd >> (8 * 0)) & 0xff);
+        commandData.push_back((net_pwd >> (8 * 1)) & 0xff);
+        commandData.push_back((net_pwd >> (8 * 2)) & 0xff);
+        commandData.push_back((net_pwd >> (8 * 3)) & 0xff);
+        commandData.insert(commandData.end(), data.begin(), data.end());
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_SSB_PARAMS, commandData);
 	}
 
     virtual SequenceId setDeviceMode(const bool enableHackMode) {
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId setConfigurationBlock(const MessageData data) {
+    virtual SequenceId setConfigurationBlock(const CommandParameters data) {
 		return INVALID_SEQUENCE_ID;
 	}
 
@@ -343,7 +386,7 @@ public:
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId setSSB(const uint password, const MessageData data) {
+    virtual SequenceId setSSB(const uint password, const CommandParameters data) {
 		return INVALID_SEQUENCE_ID;
 	}
 
@@ -383,11 +426,11 @@ public:
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId saveTemporaryMacro(const MessageData macroData) {
+    virtual SequenceId saveTemporaryMacro(const CommandParameters macroData) {
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId saveMacro(const MessageData macroData) {
+    virtual SequenceId saveMacro(const CommandParameters macroData) {
 		return INVALID_SEQUENCE_ID;
 	}
 
@@ -407,7 +450,7 @@ public:
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId appendMacroChunk(const MessageData macroData) {
+    virtual SequenceId appendMacroChunk(const CommandParameters macroData) {
 		return INVALID_SEQUENCE_ID;
 	}
 
@@ -415,7 +458,7 @@ public:
 		return INVALID_SEQUENCE_ID;
 	}
 
-    virtual SequenceId appendOrbBasicFragment(const ubyte area, const MessageData fragment) {
+    virtual SequenceId appendOrbBasicFragment(const ubyte area, const CommandParameters fragment) {
 		return INVALID_SEQUENCE_ID;
 	}
 
