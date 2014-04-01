@@ -24,9 +24,6 @@
     <ClInclude Include="BluetoothWrapper_Win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpheroProtocol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SpheroRAWItf.cpp">

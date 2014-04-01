@@ -148,7 +148,7 @@ bool BluetoothSend(BluetoothSocket &socket, const std::vector<ubyte> data) {
 
 bool BluetoothReceive(BluetoothSocket &socket, std::vector<ubyte>& data, bool bBlocking = false) {
 
-    u_long blockingMode = bBlocking ? 1 : 0; // Non-zero means non-blocking
+    u_long blockingMode = bBlocking ? 0 : 1; // Non-zero means non-blocking
     if(ioctlsocket(socket, FIONBIO, &blockingMode) == SOCKET_ERROR) {
         return false;
     }
@@ -159,9 +159,11 @@ bool BluetoothReceive(BluetoothSocket &socket, std::vector<ubyte>& data, bool bB
     SetLastError(0);
     int bytesRead = recv(socket, reinterpret_cast<char*>(data.data()), data.capacity(), 0);
     if(bytesRead == 0) {
+        data.resize(0);
         return false;
     }
     else if(bytesRead == SOCKET_ERROR) {
+        data.resize(0);
         if(GetLastError() == WSAEWOULDBLOCK)
             return true;
         else

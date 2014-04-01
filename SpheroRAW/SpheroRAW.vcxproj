@@ -68,7 +68,6 @@
   <ItemGroup>
     <ClInclude Include="BluetoothWrapper_Win32.h" />
     <ClInclude Include="SpheroDevice.h" />
-    <ClInclude Include="SpheroProtocol.h" />
     <ClInclude Include="SpheroRAWItf.h" />
   </ItemGroup>
   <ItemGroup>

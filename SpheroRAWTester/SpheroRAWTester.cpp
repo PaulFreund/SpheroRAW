@@ -37,21 +37,21 @@ using namespace std;
 //======================================================================================================================
 
 void PrintDeviceStatus(string action, ISpheroDevice* device) {
-    cout << "Action: " << action << endl;
+    cout << "Action: " << action << " Result: ";
 
     if(device == nullptr) {
-        cout << " |-- Error: Sphero handle is invalid" << endl;
+        cout << "Error - Sphero handle is invalid" << endl;
         return;
     }
 
     switch(device->state()) {
-        case SpheroState_None:                          { cout << " |-- SpheroRAW not initialized"                  << endl; break; }
-        case SpheroState_Error_BluetoothError:          { cout << " |-- Error: Couldn't initialize Bluetooth stack" << endl; break; }
-        case SpheroState_Error_BluetoothUnavailable:    { cout << " |-- Error: No valid Bluetooth adapter found"    << endl; break; }
-        case SpheroState_Error_NotPaired:               { cout << " |-- Error: Specified Sphero not Paired"         << endl; break; }
-        case SpheroState_Error_ConnectionFailed:        { cout << " |-- Error: Connecting failed"                   << endl; break; }
-        case SpheroState_Disconnected:                  { cout << " |-- Sphero disconnected"                        << endl; break; }
-        case SpheroState_Connected:                     { cout << " |-- Sphero connected"                           << endl; break; }
+        case SpheroState_None:                          { cout << "SpheroRAW not initialized"                   << endl; break; }
+        case SpheroState_Error_BluetoothError:          { cout << "Error - Couldn't initialize Bluetooth stack" << endl; break; }
+        case SpheroState_Error_BluetoothUnavailable:    { cout << "Error - No valid Bluetooth adapter found"    << endl; break; }
+        case SpheroState_Error_NotPaired:               { cout << "Error - Specified Sphero not Paired"         << endl; break; }
+        case SpheroState_Error_ConnectionFailed:        { cout << "Error - Connecting failed"                   << endl; break; }
+        case SpheroState_Disconnected:                  { cout << "Sphero disconnected"                         << endl; break; }
+        case SpheroState_Connected:                     { cout << "Sphero connected"                            << endl; break; }
     }
 
     cout << endl;
@@ -64,30 +64,52 @@ int _tmain(int argc, _TCHAR* argv[])
     //------------------------------------------------------------------------------------------------------------------
     // Create device 
     ISpheroDevice* device = SpheroRAW_Create("Sphero-GRB");
-    PrintDeviceStatus("SpheroRAW_Create(\"Sphero-GRB\");", device);
+    bool quit = false;
 
-    //------------------------------------------------------------------------------------------------------------------
-    // Connect 
-    device->connect();
-    PrintDeviceStatus("device->connect();", device);
+    while(!quit) {
+        //------------------------------------------------------------------------------------------------------------------
+        // Connect 
+        device->connect();
+        PrintDeviceStatus("Connecting", device);
 
-    //------------------------------------------------------------------------------------------------------------------
-    // Send/Receive Data
-    for(; device->state() == SpheroState_Connected;) {
-        device->receive();
-        PrintDeviceStatus("device->receive();", device);
+        //------------------------------------------------------------------------------------------------------------------
+        // Send/Receive Data
+        for(; device->state() == SpheroState_Connected;) {
+            std::vector<SpheroMessage> messages = device->receive();
+
+            if(GetAsyncKeyState('P'))
+                device->ping();
+
+            if(GetAsyncKeyState('C'))
+                device->setRGBLedOutput(rand() % 256, rand() % 256, rand() % 256, 0);
+
+            if(GetAsyncKeyState('V'))
+                device->getVersioning();
+
+            if(GetAsyncKeyState('S'))
+                device->sleep(10, 0, 0);
+
+            if(GetAsyncKeyState('T'))
+                device->getVoltageTripPoints();
+
+            if(GetAsyncKeyState('Q')) {
+                quit = true;
+                break;
+            }
+            Sleep(50);
+        }
+        PrintDeviceStatus("Poll loop exited", device);
         Sleep(1000);
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // Disconnect 
     device->disconnect();
-    PrintDeviceStatus("device->disconnect();", device);
+    PrintDeviceStatus("Disconnect", device);
 
     //------------------------------------------------------------------------------------------------------------------
     // Destroy device 
     SpheroRAW_Destroy(device); device = nullptr;
-    PrintDeviceStatus("SpheroRAW_Destroy(device); device = nullptr;", device);
 
     //------------------------------------------------------------------------------------------------------------------
     // Keep terminal open 
