@@ -371,112 +371,160 @@ public:
 	}
 
     virtual SequenceId setDeviceMode(const bool enableHackMode) {
-		return INVALID_SEQUENCE_ID;
+        ubyte flag_enableHackMode = enableHackMode ? 0x01 : 0x00;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_DEVICE_MODE, { flag_enableHackMode });
 	}
 
     virtual SequenceId setConfigurationBlock(const CommandParameters data) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_CFG_BLOCK, data);
 	}
 
     virtual SequenceId getDeviceMode() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_DEVICE_MODE);
 	}
 
     virtual SequenceId getSSB() {
-		return INVALID_SEQUENCE_ID;
-	}
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_SSB);
+    }
 
     virtual SequenceId setSSB(const uint password, const CommandParameters data) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> commandData;
+        uint net_password = htons(password);
+        commandData.push_back((net_password >> (8 * 0)) & 0xff);
+        commandData.push_back((net_password >> (8 * 1)) & 0xff);
+        commandData.push_back((net_password >> (8 * 2)) & 0xff);
+        commandData.push_back((net_password >> (8 * 3)) & 0xff);
+        commandData.insert(commandData.end(), data.begin(), data.end());
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_SSB, commandData);
 	}
 
     virtual SequenceId refillBank(const ubyte type) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_REFILL, { type });
 	}
 
     virtual SequenceId buyConsumable(const ubyte id, const ubyte quantity) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_BUY, { id, quantity });
 	}
 
     virtual SequenceId useConsumable(const ubyte id) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_USE_CONSUMEABLE, { id });
 	}
 
     virtual SequenceId grantCores(const uint password, const uint quantity, const ubyte flags) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        uint net_password = htons(password);
+        uint net_quantity = htons(quantity);
+        data.push_back((net_password >> (8 * 0)) & 0xff);
+        data.push_back((net_password >> (8 * 1)) & 0xff);
+        data.push_back((net_password >> (8 * 2)) & 0xff);
+        data.push_back((net_password >> (8 * 3)) & 0xff);
+        data.push_back((net_quantity >> (8 * 0)) & 0xff);
+        data.push_back((net_quantity >> (8 * 1)) & 0xff);
+        data.push_back((net_quantity >> (8 * 2)) & 0xff);
+        data.push_back((net_quantity >> (8 * 3)) & 0xff);
+        data.push_back(flags);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_GRANT_CORES, data);
 	}
 
     virtual SequenceId addXP(const uint password, const uint quantity) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        uint net_password = htons(password);
+        uint net_quantity = htons(quantity);
+        data.push_back((net_password >> (8 * 0)) & 0xff);
+        data.push_back((net_password >> (8 * 1)) & 0xff);
+        data.push_back((net_password >> (8 * 2)) & 0xff);
+        data.push_back((net_password >> (8 * 3)) & 0xff);
+        data.push_back((net_quantity >> (8 * 0)) & 0xff);
+        data.push_back((net_quantity >> (8 * 1)) & 0xff);
+        data.push_back((net_quantity >> (8 * 2)) & 0xff);
+        data.push_back((net_quantity >> (8 * 3)) & 0xff);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_ADD_XP, data);
 	}
 
     virtual SequenceId levelUpAttribute(const uint password, const ubyte attrId) {
-		return INVALID_SEQUENCE_ID;
+        std::vector<ubyte> data;
+        uint net_password = htons(password);
+        data.push_back((net_password >> (8 * 0)) & 0xff);
+        data.push_back((net_password >> (8 * 1)) & 0xff);
+        data.push_back((net_password >> (8 * 2)) & 0xff);
+        data.push_back((net_password >> (8 * 3)) & 0xff);
+        data.push_back(attrId);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_LEVEL_UP_ATTR, data);
 	}
 
     virtual SequenceId getPasswordSeed() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_PW_SEED);
 	}
 
-    virtual SequenceId boolenableSSBAsyncMessages(const bool enable) {
-		return INVALID_SEQUENCE_ID;
+    virtual SequenceId enableSSBAsyncMessages(const bool enable = true) {
+        ubyte flag_enable = enable ? 0x01 : 0x00;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SSB_ENABLE_ASYNC, { flag_enable });
 	}
 
     virtual SequenceId runMacro(const ubyte id) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_RUN_MACRO, { id });
 	}
 
     virtual SequenceId saveTemporaryMacro(const CommandParameters macroData) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SAVE_TEMP_MACRO, macroData);
 	}
 
     virtual SequenceId saveMacro(const CommandParameters macroData) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SAVE_MACRO, macroData);
 	}
 
     virtual SequenceId reinitMacroExecutive() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_REINIT_MACRO_EXECUTIVE);
 	}
 
     virtual SequenceId abortMacro() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_ABORT_MACRO);
 	}
 
     virtual SequenceId getMacroStatus() {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_GET_MACRO_STATUS);
 	}
 
     virtual SequenceId setMacroParameter(const ubyte parameter, const ubyte valueOne, const ubyte value) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SET_MACRO_PARAMETER, { parameter, valueOne, value });
 	}
 
     virtual SequenceId appendMacroChunk(const CommandParameters macroData) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_APPEND_MACRO_CHUNK, macroData);
 	}
 
     virtual SequenceId eraseOrbBasicStorage(const ubyte area) {
-		return INVALID_SEQUENCE_ID;
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_ERASE_ORBBASIC_STORAGE, { area });
 	}
 
     virtual SequenceId appendOrbBasicFragment(const ubyte area, const CommandParameters fragment) {
-		return INVALID_SEQUENCE_ID;
-	}
+        std::vector<ubyte> data;
+        data.push_back(area);
+        data.insert(data.end(), fragment.begin(), fragment.end());
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_APPEND_ORBBASIC_FRAGMENT, data);
+    }
 
     virtual SequenceId executeOrbBasicFragment(const ubyte area) {
-		return INVALID_SEQUENCE_ID;
-	}
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_EXECUTE_ORBBASIC_PROGRAM, { area });
+    }
 
     virtual SequenceId abortOrbBasicProgram() {
-		return INVALID_SEQUENCE_ID;
-	}
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_ABORT_ORBBASIC_PROGRAM);
+    }
 
     virtual SequenceId submitValueToInputStatement(const uint value) {
-		return INVALID_SEQUENCE_ID;
-	}
+        std::vector<ubyte> data;
+        uint net_value = htons(value);
+        data.push_back((net_value >> (8 * 0)) & 0xff);
+        data.push_back((net_value >> (8 * 1)) & 0xff);
+        data.push_back((net_value >> (8 * 2)) & 0xff);
+        data.push_back((net_value >> (8 * 3)) & 0xff);
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_SUBMIT_VALUE_TO_INPUT_STATEMENT, data);
+    }
 
     virtual SequenceId commitRAMProgramToFlash() {
-		return INVALID_SEQUENCE_ID;
-	}
+        return deviceSend(DeviceId_SPHERO, SpheroCommandId_COMMIT_RAM_PROGRAM_TO_FLASH);
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 private:
@@ -487,14 +535,14 @@ private:
         SequenceId seqId = nextSeqId();
         std::vector<ubyte> commandData = generateCommand(device, command, seqId, data);
 
-#ifdef _DEBUG
-        std::stringstream mss;
-        mss << "[SEND][" << std::setw(3) << commandData.size() << "B] ";
-        for(size_t idx = 0; idx < commandData.size(); ++idx) {
-            mss << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(commandData[idx]) << " ";
-        }
-        std::cout << mss.str() << std::endl;
-#endif
+        #ifdef _DEBUG
+                std::stringstream mss;
+                mss << "[SEND][" << std::setw(3) << commandData.size() << "B] ";
+                for(size_t idx = 0; idx < commandData.size(); ++idx) {
+                    mss << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(commandData[idx]) << " ";
+                }
+                std::cout << mss.str() << std::endl;
+        #endif
 
         if(!BluetoothSend(_socket, commandData))
             return 0;
@@ -552,14 +600,14 @@ private:
             if(_receiveBuffer[dataLength+4] != checkSum)
                 return SpheroState_Disconnected;
 
-#ifdef _DEBUG
-            std::stringstream mss;
-            mss << "[RECV][" << std::setw(3) << messageLength << "B] ";
-            for(size_t idx = 0; idx < messageLength; ++idx) {
-                mss << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(_receiveBuffer[idx]) << " ";
-            }
-            std::cout << mss.str() << std::endl;
-#endif
+            #ifdef _DEBUG
+                        std::stringstream mss;
+                        mss << "[RECV][" << std::setw(3) << messageLength << "B] ";
+                        for(size_t idx = 0; idx < messageLength; ++idx) {
+                            mss << std::uppercase << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(_receiveBuffer[idx]) << " ";
+                        }
+                        std::cout << mss.str() << std::endl;
+            #endif
 
             newMessage.data.insert(newMessage.data.end(), _receiveBuffer.begin() + SPHERO_RESPONSE_HEADER_SIZE, _receiveBuffer.begin() + (messageLength - 1));
             _receiveBuffer.erase(_receiveBuffer.begin(), _receiveBuffer.begin() + messageLength);

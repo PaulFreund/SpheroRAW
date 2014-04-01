@@ -45,7 +45,8 @@ typedef uint16_t ushort;
 typedef uint32_t uint;
 
 typedef ubyte SequenceId;
-#define INVALID_SEQUENCE_ID 0
+const ubyte INVALID_SEQUENCE_ID = 0;
+
 typedef std::vector<ubyte> MessageData;
 typedef std::vector<ubyte> CommandParameters;
 
@@ -141,7 +142,19 @@ enum SpheroCommandId {
     SpheroCommandId_GET_PW_SEED = 0x4E,
     SpheroCommandId_SSB_ENABLE_ASYNC = 0x4F,
     SpheroCommandId_RUN_MACRO = 0x50,
-    SpheroCommandId_SAVE_TEMP_MACRO = 0x51
+    SpheroCommandId_SAVE_TEMP_MACRO = 0x51,
+    SpheroCommandId_SAVE_MACRO = 0x52,
+    SpheroCommandId_REINIT_MACRO_EXECUTIVE = 0x54,
+    SpheroCommandId_ABORT_MACRO = 0x55,
+    SpheroCommandId_GET_MACRO_STATUS = 0x56,
+    SpheroCommandId_SET_MACRO_PARAMETER = 0x57,
+    SpheroCommandId_APPEND_MACRO_CHUNK = 0x58,
+    SpheroCommandId_ERASE_ORBBASIC_STORAGE = 0x60,
+    SpheroCommandId_APPEND_ORBBASIC_FRAGMENT = 0x61,
+    SpheroCommandId_EXECUTE_ORBBASIC_PROGRAM = 0x62,
+    SpheroCommandId_ABORT_ORBBASIC_PROGRAM = 0x63,
+    SpheroCommandId_SUBMIT_VALUE_TO_INPUT_STATEMENT = 0x64,
+    SpheroCommandId_COMMIT_RAM_PROGRAM_TO_FLASH = 0x65
 };
 
 enum ResponseCode {
@@ -272,7 +285,7 @@ public:
     virtual SequenceId addXP(const uint password, const uint quantity) = 0;
     virtual SequenceId levelUpAttribute(const uint password, const ubyte attrId) = 0;
     virtual SequenceId getPasswordSeed() = 0;
-    virtual SequenceId boolenableSSBAsyncMessages(const bool enable) = 0;
+    virtual SequenceId enableSSBAsyncMessages(const bool enable = true) = 0;
     virtual SequenceId runMacro(const ubyte id) = 0;
     virtual SequenceId saveTemporaryMacro(const CommandParameters macroData) = 0;
     virtual SequenceId saveMacro(const CommandParameters macroData) = 0;
